@@ -1,0 +1,157 @@
+<div class="w-full bg-white rounded-2xl shadow-2xl mb-6 p-16">
+    <h1 class="text-2xl font-bold mb-6">Messages</h1>
+    {% if all_messages|length == 0 %}
+    <p>No messages</p>
+    {% else %}
+    <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center">
+            <label for="clientActiveFilter" class="text-sm font-medium text-gray-700 mr-5">Filter by client:</label>
+            <input type="text" id="clientActiveFilter" name="clientActiveFilter"
+                class="mt-1 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Search client">
+        </div>
+    </div>
+    <table class="table-auto w-full border-collapse rounded-lg" id="activeMessages">
+        <thead>
+            <tr>
+                {% for header in messages_header %}
+                <th class="border border-black px-4 py-2 text-center">{{ header }}</th>
+                {% endfor %}
+                <th class="border border-black px-4 py-2 text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in all_messages %}
+            <tr>
+                {% for key, value in message %}
+                <td class="border border border-black px-4 py-2 text-center">{{ value }}</td>
+                {% endfor %}
+                <td class="border border border-black px-4 py-2 text-center">
+                    <button data-id="{{ message.id }}"
+                        class="archive-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Archive</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+
+<div class="w-full bg-white rounded-2xl shadow-2xl mb-6 p-16">
+    <h1 class="text-2xl font-bold mb-6">Archived Messages</h1>
+    {% if archived_messages|length == 0 %}
+    <p>No messages</p>
+    {% else %}
+    <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center">
+            <label for="clientArchivedFilter" class="text-sm font-medium text-gray-700 mr-5">Filter by client:</label>
+            <input type="text" id="clientArchivedFilter" name="clientArchivedFilter"
+                class="mt-1 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Search client">
+        </div>
+    </div>
+    <table class="table-auto w-full border-collapse rounded-lg" id="archivedMessages">
+        <thead>
+            <tr>
+                {% for header in messages_header %}
+                <th class="border border-black px-4 py-2 text-center">{{ header }}</th>
+                {% endfor %}
+                <th class="border border-black px-4 py-2 text-center">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in archived_messages %}
+            <tr>
+                {% for key, value in message %}
+                <td class="border border border-black px-4 py-2 text-center">{{ value }}</td>
+                {% endfor %}
+                <td class="border border border-black px-4 py-2 text-center">
+                    <button data-id="{{ message.id }}"
+                        class="unarchive-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Unarchive</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+
+<script>
+    const clientActiveFilter = document.getElementById('clientActiveFilter');
+    const tableRows = document.querySelectorAll('#activeMessages tbody tr');
+
+    clientActiveFilter.addEventListener('input', (e) => {
+        const filter = e.target.value.toLowerCase();
+        tableRows.forEach(row => {
+            const client = row.children[0].textContent.toLowerCase();
+            if (client.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    const clientArchivedFilter = document.getElementById('clientArchivedFilter');
+    const archivedTableRows = document.querySelectorAll('#archivedMessages tbody tr');
+
+    clientArchivedFilter.addEventListener('input', (e) => {
+        const filter = e.target.value.toLowerCase();
+        archivedTableRows.forEach(row => {
+            const client = row.children[0].textContent.toLowerCase();
+            if (client.includes(filter)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    const archiveButtons = document.querySelectorAll('.archive-button');
+
+    archiveButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const data = { archived: 1 };
+
+            $.ajax({
+                url: `/index.php/api/messages/edit/${id}`,
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    console.log(JSON.parse(response));
+                    if (JSON.parse(response).status) {
+                        window.location.reload();
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+
+    const unarchiveButtons = document.querySelectorAll('.unarchive-button');
+
+    unarchiveButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const data = { archived: 0 };
+
+            $.ajax({
+                url: `/index.php/api/messages/edit/${id}`,
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    console.log(JSON.parse(response));
+                    if (JSON.parse(response).status) {
+                        window.location.reload();
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+</script>

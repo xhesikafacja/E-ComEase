@@ -1,0 +1,77 @@
+<div class="h-screen bg-center bg-no-repeat bg-cover" style="background-image: url('/views/assets/img/login_bg.jpg')">
+	<script>
+		window.onload = function () {
+			function time_teller() {
+				var d = new Date();
+				var n = d.getHours();
+				var time_teller = document.getElementById("time_teller");
+				var time_teller_icon = document.getElementById("time_teller_icon");
+
+				if (n < 12) {
+					time_teller_icon.classList.add("fas", "fa-sun");
+					time_teller.innerHTML = "Good Morning";
+				} else if (n < 18) {
+					time_teller_icon.classList.add("fas", "fa-cloud-sun");
+					time_teller.innerHTML = "Good Afternoon";
+				} else {
+					time_teller_icon.classList.add("fas", "fa-moon");
+					time_teller.innerHTML = "Good Evening";
+				}
+			}
+
+			time_teller();
+
+			document.getElementById("login_form").addEventListener("submit", function (e) {
+				e.preventDefault();
+
+				let button = document.getElementById("login_button");
+				button.innerHTML = "<i class='fa fa-circle-o-notch fa-spin'></i> Logging in...";
+
+				var username = document.getElementById("typeEmailX-2").value;
+				var password = document.getElementById("typePasswordX-2").value;
+				var formData = new FormData();
+				formData.append("username", username);
+				formData.append("password", password);
+
+				fetch("/login.php", {
+					method: "POST",
+					body: formData
+				}).then(response => response.json()).then(data => {
+					if (data.status) {
+						window.location.href = "/index.php/";
+					} else {
+						setTimeout(function () {
+							button.innerHTML = "Login";
+							alertify.warning(data.message)
+						}, 700);
+					}
+				}).catch(error => {
+					setTimeout(function () {
+						button.innerHTML = "Login";
+					}, 700);
+				});
+			});
+		}
+	</script>
+	<form id='login_form' class="h-screen flex items-center justify-center">
+		<div
+			class="md:w-1/2 lg:w-1/3 xl:w-1/4 bg-white bg-opacity-50 backdrop-blur rounded-xl shadow-2xl p-10 text-center">
+			<div class="mb-5">
+				<i id="time_teller_icon" />
+				<span id="time_teller"></span>
+			</div>
+			<div class="mb-4">
+				<input id="typeEmailX-2" class="w-full p-2 border border-gray-300 rounded" placeholder="Username"
+					required />
+			</div>
+			<div class="mb-4">
+				<input type="password" id="typePasswordX-2" class="w-full p-2 border border-gray-300 rounded"
+					placeholder="Password" required />
+			</div>
+			<div>
+				<button class="w-full py-2 bg-blue-600 text-white rounded" id="login_button"
+					type="submit">Login</button>
+			</div>
+		</div>
+	</form>
+</div>

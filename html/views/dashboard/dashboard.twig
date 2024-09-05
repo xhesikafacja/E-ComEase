@@ -1,0 +1,33 @@
+<div class="px-4 pt-6 mb-6">
+	<div
+		class="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+		<!-- Main widget -->
+		{{ include('components/main_widget.twig'
+        , {
+            'currency': currency,
+            'sales': sales,
+        }) }}
+
+		<div
+			class="grid w-full grid-cols-1 gap-4">
+			<!-- Cards -->
+			{{ include('components/card.twig', {
+				'title': 'New Products',
+				'amount': '10',
+			}) }}
+			{{ include('components/card.twig', {
+				'title': 'New Clients',
+				'amount': '5',
+			}) }}
+		</div>
+
+	</div>
+	<div
+		class="grid w-full grid-cols-1 gap-4">
+		<!-- Table -->
+		{{ include('components/table.twig', {
+				'title': 'Top Products',
+				'data': sales,
+			}) }}
+	</div>
+</div>
